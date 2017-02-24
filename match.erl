@@ -1,4 +1,4 @@
--module(patterns1).
+-module(match).
 -export([
   how_many_equal/3,
   is_zero/1,

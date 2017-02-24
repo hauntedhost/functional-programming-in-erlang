@@ -1,4 +1,4 @@
--module(first).
+-module(one).
 -export([area/3, double/1, mult/2]).
 
 % calculate hypotenuse of right triangle

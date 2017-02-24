@@ -1,4 +1,4 @@
--module(second).
+-module(two).
 -export([area/2, hyp/2, perim/2]).
 
 % square a number
