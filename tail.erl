@@ -98,8 +98,8 @@ flatten(L) ->
   flatten(L, []).
 
 flatten([], F) ->
-  lists:reverse(F);
+  F;
 flatten([H | T], F) when is_list(H) ->
-  flatten(T ++ H, F);
+  flatten(H ++ T, F);
 flatten([H | T], F) ->
-  flatten(T, [H | F]).
+  flatten(T, F ++ [H]).
