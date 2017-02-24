@@ -4,6 +4,7 @@
   fib/1,
   fibs1/1,
   fibs2/1,
+  flatten/1,
   perfect1/1,
   perfect2/1,
   pieces/1
@@ -89,3 +90,16 @@ perfect2(N, Div, Sum) when N rem Div == 0 ->
   perfect2(N, Div + 1, Sum + Div);
 perfect2(N, Div, Sum) ->
   perfect2(N, Div + 1, Sum).
+
+% hacker news inspired me today
+% https://news.ycombinator.com/item?id=13723356
+
+flatten(L) ->
+  flatten(L, []).
+
+flatten([], F) ->
+  lists:reverse(F);
+flatten([H | T], F) when is_list(H) ->
+  flatten(T ++ H, F);
+flatten([H | T], F) ->
+  flatten(T, [H | F]).

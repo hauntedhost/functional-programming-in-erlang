@@ -4,6 +4,7 @@
   fib/1,
   fibs1/1,
   fibs2/1,
+  flatten/1,
   pieces/1
 ]).
 
@@ -49,3 +50,13 @@ pieces(1) ->
   2;
 pieces(N) ->
   N + pieces(N - 1).
+
+% hacker news inspired me today
+% https://news.ycombinator.com/item?id=13723356
+
+flatten([]) ->
+  [];
+flatten([X | Xs]) when is_list(X) ->
+  flatten(X) ++ flatten(Xs);
+flatten([X | Xs]) ->
+  [X | flatten(Xs)].
