@@ -1,7 +1,8 @@
 -module(week1).
 -export([
   area/1,
-  bits/1,
+  bits_b/1,
+  bits_n/1,
   enclose/1,
   perimeter/1
 ]).
@@ -45,11 +46,20 @@ enclose({circle, R}) ->
   D = R * 2,
   {rectangle, {D, D}}.
 
-% tail recursive
-bits(N) when is_number(N) ->
-  bits(integer_to_binary(N, 2), 0).
+% bits with tail recursion
+bits_n(N) ->
+  bits_n(N, 0).
 
-bits(<<>>, S) ->
+bits_n(N, R) when N < 2, N >= 0 ->
+  R;
+bits_n(N, R) ->
+  bits_n(N div 2, R + N rem 2).
+
+% tail recursive using binary conversion/matching (maybe weird)
+bits_b(N) when is_number(N) ->
+  bits_b(integer_to_binary(N, 2), 0).
+
+bits_b(<<>>, S) ->
   S;
-bits(<<H:1/binary, T/binary>>, S) ->
-  bits(T, S + binary_to_integer(H)).
+bits_b(<<H:1/binary, T/binary>>, S) ->
+  bits_b(T, S + binary_to_integer(H)).
