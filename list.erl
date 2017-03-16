@@ -1,7 +1,11 @@
 -module(list).
 -export([
+  double/1,
+  evens/1,
   head/1,
   maximum/1,
+  median/1,
+  modes/1,
   product/1,
   sum/1,
   sum_t/1,
@@ -37,3 +41,29 @@ weird_case(L) when is_list(L) ->
     [A]       -> A;
     _         -> 0
   end.
+
+double([]) -> [];
+double([X | Xs]) -> [X * 2 | double(Xs)].
+
+evens([]) -> [];
+evens([X | Xs]) when X rem 2 == 0 -> [X | evens(Xs)];
+evens([_ | Xs]) -> evens(Xs).
+
+median(L = [_ | _]) -> do_median(lists:sort(L)).
+
+do_median([M]) ->
+  M;
+do_median(L) when length(L) rem 2 == 0 ->
+  NthA = length(L) div 2,
+  NthB = NthA + 1,
+  (lists:nth(NthA, L) + lists:nth(NthB, L)) / 2;
+do_median(L) ->
+  Nth = (length(L) div 2) + 1,
+  lists:nth(Nth, L).
+
+% given list, returns map with counts of how many times each value occured
+modes(List) -> modes(List, #{}).
+modes([], Modes) -> Modes;
+modes([X | Xs], Modes) ->
+  Count = maps:get(X, Modes, 0) + 1,
+  modes(Xs, maps:put(X, Count, Modes)).
