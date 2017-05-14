@@ -2,6 +2,7 @@
 -export([
   double/1,
   evens/1,
+  filter/2,
   head/1,
   maximum/1,
   median/1,
@@ -9,8 +10,12 @@
   modes/1,
   nub_first/1,
   nub_last/1,
+  palindrome/1,
   product/1,
   remove_all/2,
+  remove_punctuation/1,
+  remove_punctuation2/1,
+  reverse/1,
   split_t/2,
   sum/1,
   sum_t/1,
@@ -84,8 +89,8 @@ take(N, [X | Xs]) when N > 0 -> [X | take(N - 1, Xs)].
 % tail call optimized take
 -spec take_t(integer(), [T]) -> [T].
 take_t(N, List) -> take_t(N, List, []).
-take_t(0, _, Accum) -> lists:reverse(Accum);
-take_t(_N, [], Accum) -> lists:reverse(Accum);
+take_t(0, _, Accum) -> reverse(Accum);
+take_t(_N, [], Accum) -> reverse(Accum);
 take_t(N, [X | Xs], Accum) when N > 0 ->
   take_t(N - 1, Xs, [X | Accum]).
 
@@ -93,7 +98,7 @@ take_t(N, [X | Xs], Accum) when N > 0 ->
 % slice of N elements on left and remainder on right
 -spec split_t(integer(), [T]) -> {[T], [T]}.
 split_t(N, Right) -> split_t(N, [], Right).
-split_t(0, Left, Right) -> {lists:reverse(Left), Right};
+split_t(0, Left, Right) -> {reverse(Left), Right};
 split_t(N, Left, [X | Xs]) ->
   split_t(N - 1, [X | Left], Xs);
 split_t(_N, _Left, []) ->
@@ -101,7 +106,7 @@ split_t(_N, _Left, []) ->
 
 % remove dups from list, keeping first occurence
 nub_first(List) -> nub_first(List, [], #{}).
-nub_first([], Accum, _Cache) -> lists:reverse(Accum);
+nub_first([], Accum, _Cache) -> reverse(Accum);
 nub_first([X | Xs], Accum, Cache) ->
   case Cache of
     #{X := _} -> nub_first(Xs, Accum, Cache);
@@ -110,8 +115,8 @@ nub_first([X | Xs], Accum, Cache) ->
 
 % remove dups from list, keeping last occurence
 nub_last(List) ->
-  Result = nub_first(lists:reverse(List)),
-  lists:reverse(Result).
+  Result = nub_first(reverse(List)),
+  reverse(Result).
 
 % check if value is in list
 member(_X, []) -> false;
@@ -120,6 +125,37 @@ member(X, [_Y | Xs]) -> member(X, Xs).
 
 % remove all occurences of value from list
 remove_all(X, List) -> remove_all(X, List, []).
-remove_all(_X, [], Accum) -> lists:reverse(Accum);
+remove_all(_X, [], Accum) -> reverse(Accum);
 remove_all(X, [X | Xs], Accum) -> remove_all(X, Xs, Accum);
 remove_all(X, [Y | Xs], Accum) -> remove_all(X, Xs, [Y | Accum]).
+
+palindrome(String) ->
+  Word = remove_punctuation(String),
+  Reversed = reverse(Word),
+  string:to_lower(Word) == string:to_lower(Reversed).
+
+remove_punctuation(String) ->
+  Punctuation = " !@#$%^&*()-_=+{}[]|\\;:'\"<>,.?/\n\t",
+  Tokens = string:tokens(String, Punctuation),
+  string:join(Tokens, "").
+
+remove_punctuation2(List) -> remove_punctuation2(List, []).
+remove_punctuation2([], Accum) -> reverse(Accum);
+remove_punctuation2([X | Xs], Accum) ->
+  Punctuation = " !@#$%^&*()-_=+{}[]|\\;:'\"<>,.?/\n\t",
+  case member(X, Punctuation) of
+    true  -> remove_punctuation2(Xs, Accum);
+    false -> remove_punctuation2(Xs, [X | Accum])
+  end.
+
+filter(List, FilterFn) -> filter(List, FilterFn, []).
+filter([], _FilterFn, Accum) -> reverse(Accum);
+filter([X | Xs], FilterFn, Accum) ->
+  case FilterFn(X) of
+    true  -> filter(Xs, FilterFn, [X | Accum]);
+    false -> filter(Xs, FilterFn, Accum)
+  end.
+
+reverse(List) -> reverse(List, []).
+reverse([], Reversed) -> Reversed;
+reverse([X | Xs], Reversed) -> reverse(Xs, [X | Reversed]).
