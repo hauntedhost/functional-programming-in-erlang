@@ -6,6 +6,7 @@
   maximum/1,
   median/1,
   modes/1,
+  nub/1,
   product/1,
   split_t/2,
   sum/1,
@@ -94,3 +95,12 @@ split_t(N, Left, [X | Xs]) ->
   split_t(N - 1, [X | Left], Xs);
 split_t(_N, _Left, []) ->
   erlang:error(badarg).
+
+% remove dups from list
+nub(List) -> nub(List, [], #{}).
+nub([], Accum, _Cache) -> lists:reverse(Accum);
+nub([X | Xs], Accum, Cache) ->
+  case Cache of
+    #{X := _} -> nub(Xs, Accum, Cache);
+    _         -> nub(Xs, [X | Accum], maps:put(X, true, Cache))
+  end.
