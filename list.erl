@@ -5,10 +5,12 @@
   head/1,
   maximum/1,
   median/1,
+  member/2,
   modes/1,
   nub_first/1,
   nub_last/1,
   product/1,
+  remove_all/2,
   split_t/2,
   sum/1,
   sum_t/1,
@@ -110,3 +112,14 @@ nub_first([X | Xs], Accum, Cache) ->
 nub_last(List) ->
   Result = nub_first(lists:reverse(List)),
   lists:reverse(Result).
+
+% check if value is in list
+member(_X, []) -> false;
+member(X, [X | _Xs]) -> true;
+member(X, [_Y | Xs]) -> member(X, Xs).
+
+% remove all occurences of value from list
+remove_all(X, List) -> remove_all(X, List, []).
+remove_all(_X, [], Accum) -> lists:reverse(Accum);
+remove_all(X, [X | Xs], Accum) -> remove_all(X, Xs, Accum);
+remove_all(X, [Y | Xs], Accum) -> remove_all(X, Xs, [Y | Accum]).
