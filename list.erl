@@ -1,16 +1,18 @@
 -module(list).
 -export([
+  concat/1,
   double/1,
   evens/1,
   filter/2,
   head/1,
+  is_member/2,
+  is_palindrome/1,
+  join/2,
   maximum/1,
   median/1,
-  member/2,
   modes/1,
   nub_first/1,
   nub_last/1,
-  palindrome/1,
   product/1,
   remove_all/2,
   remove_punctuation/1,
@@ -119,9 +121,9 @@ nub_last(List) ->
   reverse(Result).
 
 % check if value is in list
-member(_X, []) -> false;
-member(X, [X | _Xs]) -> true;
-member(X, [_Y | Xs]) -> member(X, Xs).
+is_member(_X, []) -> false;
+is_member(X, [X | _Xs]) -> true;
+is_member(X, [_Y | Xs]) -> is_member(X, Xs).
 
 % remove all occurences of value from list
 remove_all(X, List) -> remove_all(X, List, []).
@@ -129,33 +131,64 @@ remove_all(_X, [], Accum) -> reverse(Accum);
 remove_all(X, [X | Xs], Accum) -> remove_all(X, Xs, Accum);
 remove_all(X, [Y | Xs], Accum) -> remove_all(X, Xs, [Y | Accum]).
 
-palindrome(String) ->
+% check if given string is a palindrom
+is_palindrome(String) ->
   Word = remove_punctuation(String),
   Reversed = reverse(Word),
   string:to_lower(Word) == string:to_lower(Reversed).
 
+% strip punctuation, leveraging string:tokens
 remove_punctuation(String) ->
   Punctuation = " !@#$%^&*()-_=+{}[]|\\;:'\"<>,.?/\n\t",
   Tokens = string:tokens(String, Punctuation),
   string:join(Tokens, "").
 
+% strip punctuation recursively
 remove_punctuation2(List) -> remove_punctuation2(List, []).
 remove_punctuation2([], Accum) -> reverse(Accum);
 remove_punctuation2([X | Xs], Accum) ->
   Punctuation = " !@#$%^&*()-_=+{}[]|\\;:'\"<>,.?/\n\t",
-  case member(X, Punctuation) of
+  case is_member(X, Punctuation) of
     true  -> remove_punctuation2(Xs, Accum);
     false -> remove_punctuation2(Xs, [X | Accum])
   end.
 
-filter(List, FilterFn) -> filter(List, FilterFn, []).
-filter([], _FilterFn, Accum) -> reverse(Accum);
-filter([X | Xs], FilterFn, Accum) ->
-  case FilterFn(X) of
-    true  -> filter(Xs, FilterFn, [X | Accum]);
-    false -> filter(Xs, FilterFn, Accum)
+% filter list using given function
+filter(List, PredicateFun) -> filter(List, PredicateFun, []).
+filter([], _PredicateFun, Accum) -> reverse(Accum);
+filter([X | Xs], PredicateFun, Accum) ->
+  case PredicateFun(X) of
+    true  -> filter(Xs, PredicateFun, [X | Accum]);
+    false -> filter(Xs, PredicateFun, Accum)
   end.
 
+% reverse given list
 reverse(List) -> reverse(List, []).
 reverse([], Reversed) -> Reversed;
 reverse([X | Xs], Reversed) -> reverse(Xs, [X | Reversed]).
+
+% join two lists together
+join(Xs, Ys) -> do_join(reverse(Xs), Ys).
+do_join([], Accum) -> Accum;
+do_join([X | Xs], Accum) -> do_join(Xs, [X | Accum]).
+
+% concat a list of lists
+% e.g. concat([[1, 2], [3, 4]]) = [1, 2, 3, 4].
+concat(List) -> concat(List, []).
+concat([], Accum) -> Accum;
+concat([Xs | Ys], Accum) -> concat(Ys, join(Accum, Xs)).
+
+% TODO: Sorting lists
+% A list can be sorted in a number of ways, including these algorithms described informally:
+%
+% Merge sort: divide the list into two halves of (approximately) equal length, sort them (recursively) and then merge the results.
+%
+% Quicksort: split the list into two according to whether the items are smaller than (or equal to) or larger than the pivot, often taken to be the head element of the list; sort the two halves and join the results together.
+%
+% Insertion sort: sort the tail of the list and then insert the head of the list in the correct place.
+
+% TODO: Permutations
+% A permutation of a list xs consists of the same elements in a (potentially) different order. Define a function that gives all the permutations of a list, in some order. For example:
+%
+% perms([]) = [[]]
+% perms([1,2,3]) = [[1,2,3],[2,3,1],[3,1,2],[2,1,3],[1,3,2],[3,2,1]]
