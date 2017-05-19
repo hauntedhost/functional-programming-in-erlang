@@ -10,8 +10,12 @@
   % ---
   reduce/3,
   group_by/2,
+  product/1,
   sum/1,
-  word_lengths/1
+  word_lengths/1,
+  % ---
+  zip/2,
+  zip_with/3
 ]).
 
 % filter
@@ -57,3 +61,16 @@ group_by(F, List) -> reduce(
   end, #{}, List).
 
 word_lengths(Words) -> group_by(fun(W) -> length(W) end, Words).
+
+product(List) -> reduce(fun(N, P) -> N * P end, 1, List).
+
+zip_with(F, Xs, Ys) -> zip_with(F, Xs, Ys, []).
+zip_with(F, [X | Xs], [Y | Ys], Zs) ->
+  Z = F(X, Y),
+  zip_with(F, Xs, Ys, [Z | Zs]);
+zip_with(_, _, _, Zs) -> lists:reverse(Zs).
+
+zip(Xs, Ys) -> zip_with(fun(X, Y) -> {X, Y} end, Xs, Ys).
+% zip(Xs, Ys) -> zip(Xs, Ys, []).
+% zip([X | Xs], [Y | Ys], Zs) -> zip(Xs, Ys, [{X, Y} | Zs]);
+% zip(_, _, Zs) -> lists:reverse(Zs).
