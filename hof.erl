@@ -1,22 +1,52 @@
 -module (hof).
 -export([
-  filter/2,
-  evens/1,
-  odds/1,
-  % ---
-  map/2,
-  doubles/1,
-  squares/1,
-  % ---
-  reduce/3,
-  group_by/2,
-  product/1,
-  sum/1,
-  word_lengths/1,
-  % ---
-  zip/2,
-  zip_with/3
+  add_five/1,
+  add_five_then_is_ten/1,
+  add_ten/1,
+  add_twenty/1,
+  compose/2,
+  doubles/1, % map
+  evens/1, % filter
+  filter/2, % **
+  group_by/2, % map
+  is_ten_then_add_five/1,
+  iterate/1,
+  map/2, % **
+  odds/1, % filter
+  product/1, % map
+  reduce/3, % **
+  squares/1, % map
+  sum/1, % map,
+  twice/1,
+  word_lengths/1, % map
+  zip_with/3,
+  zip/2
 ]).
+
+compose(F, G) -> fun(X) -> G(F(X)) end.
+% compose(List)?
+
+create_adder(X) -> fun(Y) -> X + Y end.
+create_is_equal(X) -> fun(Y) -> X == Y end.
+
+add_five_then_is_ten(X) ->
+  F = compose(create_adder(5), create_is_equal(10)),
+  F(X).
+
+% commutative error
+is_ten_then_add_five(X) ->
+  F = compose(create_is_equal(10), create_adder(5)),
+  F(X).
+
+twice(F) -> fun(X) -> F(F(X)) end.
+
+% let's overcomplicate adding numbers for fun
+add_five(X) -> (create_adder(5))(X).
+add_ten(X) -> (twice(fun add_five/1))(X).
+add_twenty(X) -> (twice(twice(fun add_five/1)))(X).
+
+iterate(0) -> fun(F) -> F end;
+iterate(N) -> fun(F) -> F(iterate(N - 1)) end.
 
 % filter
 
