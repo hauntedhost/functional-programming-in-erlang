@@ -23,6 +23,12 @@ what_loses_to(paper)    -> rock;
 what_loses_to(scissors) -> paper;
 what_loses_to(_)        -> unknown.
 
+score(lose) -> -1;
+score(win)  -> 1;
+score(draw) -> 0.
+
+% play one round
+
 play(A, B) ->
   case {what_beats(A), what_loses_to(A)} of
     {B, _}  -> lose;
@@ -30,9 +36,7 @@ play(A, B) ->
     {_ , _} -> draw
   end.
 
-score(lose) -> -1;
-score(win)  -> 1;
-score(draw) -> 0.
+% play multiple rounds
 
 % rps:match([rock, rock, rock, rock], [scissors, scissors, scissors, paper]) == 2.
 
@@ -46,3 +50,13 @@ match(_, _, N) -> N.
 %   Results = zip_with(fun play/2, Xs, Ys),
 %   Scores = map(fun score/1, Results),
 %   reduce(fun (N, Sum) -> Sum + N end, 0, Scores).
+
+% stategies
+
+enum(0) -> rock;
+enum(1) -> paper;
+enum(2) -> scissors;
+
+value(rock)     -> 0;
+value(paper)    -> 1;
+value(scissors) -> 2.

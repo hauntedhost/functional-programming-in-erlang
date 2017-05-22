@@ -10,20 +10,28 @@
   filter/2, % **
   group_by/2, % map
   is_ten_then_add_five/1,
-  iterate/1,
+  % iterate/1,
   map/2, % **
   odds/1, % filter
   product/1, % map
   reduce/3, % **
   squares/1, % map
   sum/1, % map,
+  three_hi/0,
+  times/2,
   twice/1,
   word_lengths/1, % map
   zip_with/3,
   zip/2
 ]).
 
-compose(F, G) -> fun(X) -> G(F(X)) end.
+compose(F, G) ->
+  case erlang:fun_info(F, arity) of
+    {arity, 1} -> fun(A) -> G(F(A)) end;
+    {arity, 2} -> fun(A, B) -> G(F(A, B)) end;
+    {arity, 3} -> fun(A, B, C) -> G(F(A, B, C)) end;
+    {arity, 4} -> fun(A, B, C, D) -> G(F(A, B, C, D)) end
+  end.
 % compose(List)?
 
 create_adder(X) -> fun(Y) -> X + Y end.
@@ -45,8 +53,36 @@ add_five(X) -> (create_adder(5))(X).
 add_ten(X) -> (twice(fun add_five/1))(X).
 add_twenty(X) -> (twice(twice(fun add_five/1)))(X).
 
-iterate(0) -> fun(F) -> F end;
-iterate(N) -> fun(F) -> F(iterate(N - 1)) end.
+% times(N, F) -> (compose(F, times(N - 1, F)))(N).
+% times(N, F) -> compose(F, (times(N - 1, F))(N)).
+% times(1, F) -> F(1);
+% times(N, F) -> times(N - 1, compose(F, F)).
+
+% times(0, F) -> F;
+% times(1, F) -> F();
+% times(N, F) -> F(), times(N - 1, F).
+
+% times(0, F) -> F;
+% times(N, F) -> F(), times(N - 1, F).
+% times(N, F) -> compose(F, times(N - 1, F)).
+
+% times(0, F) -> fun() -> F() end;
+% times(N, F) -> F(), times(N - 1, F).
+
+% iterate(0) ->
+%   fun(_F) ->
+%     fun() -> nil end
+%   end;
+% iterate(N) ->
+%   fun(F) ->
+%     compose(F, (iterate(N - 1))(F))
+%   end.
+
+times(0, F) -> F;
+times(N, F) -> F(N), times(N - 1, F).
+
+say_hi(N) -> io:fwrite("~p: ~p~n", [N, "hi!"]).
+three_hi() -> times(3, fun say_hi/1).
 
 % filter
 
