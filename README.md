@@ -5,4 +5,4 @@
 Personal code while attending [Functional Programming in Erlang](https://www.futurelearn.com/courses/functional-programming-erlang). Very digestible crash course in Erlang.
 
 ---
-[Sean Omlor](http://seanomlor.com)
+👻 [haunted.host](https://www.haunted.host)
